@@ -32,13 +32,15 @@ const Home: NextPage = () => {
         shouldUnregister: true,
     });
 
-    const onSubmit = (data: any) => {
-        const total = data?.[CONSTS.FIELD]?.reduce(
+    const onSubmit = (data) => {
+        const total = data?.[CONSTS.FIELDS]?.reduce(
             (accumulator, current) => accumulator + current?.value,
             0
         );
         setResult(formatNumber(total));
     };
+
+    const onError = (errors) => console.log(errors);
 
     const handleReset = () => {
         reset();
@@ -64,7 +66,7 @@ const Home: NextPage = () => {
                                     <input
                                         key={field.id}
                                         {...register(
-                                            `field.${index}.name` as const,
+                                            `fields.${index}.name` as const,
                                             {
                                                 required: true,
                                             }
@@ -86,7 +88,7 @@ const Home: NextPage = () => {
                                     <input
                                         key={field.id} // important to include key with field's id
                                         {...register(
-                                            `field.${index}.value` as const,
+                                            `fields.${index}.value` as const,
                                             {
                                                 required: true,
                                                 valueAsNumber: true,
@@ -112,7 +114,9 @@ const Home: NextPage = () => {
                     <button type='button' onClick={append}>
                         Add field
                     </button>
-                    <button onClick={handleSubmit(onSubmit)}>Calculate</button>
+                    <button onClick={handleSubmit(onSubmit, onError)}>
+                        Calculate
+                    </button>
                     <button onClick={handleReset}>Reset</button>
                 </div>
             </>

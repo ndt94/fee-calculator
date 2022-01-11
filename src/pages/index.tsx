@@ -47,6 +47,15 @@ const Home: NextPage = () => {
         setResult('');
     };
 
+    const handleAdd = () => {
+        if (!isSubmitted) {
+            append({});
+        } else {
+            append({});
+            reset(undefined, {keepValues: true}) // values in reset is optional so we put undefined as TS docs, https://stackoverflow.com/questions/30734509/how-to-pass-optional-parameters-while-omitting-some-other-optional-parameters
+        }
+    };
+
     const handleRemoveField = (index: number) => () => remove(index);
 
     return (
@@ -111,7 +120,7 @@ const Home: NextPage = () => {
                 </form>
 
                 <div className='actions'>
-                    <button type='button' onClick={append}>
+                    <button type='button' onClick={handleAdd}>
                         Add field
                     </button>
                     <button onClick={handleSubmit(onSubmit, onError)}>

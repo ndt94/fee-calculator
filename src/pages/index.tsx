@@ -15,10 +15,20 @@ export const formatNumber = (value: number): string => {
     return number.replace(WHOLE_NUMBER_REGEX, dividedNumber);
 };
 
+export const convertTimeNumberToString = (raw: number): string => {
+    if (raw < 10) return `T${raw.toString()}`;
+    return `T${raw.toString()}`;
+};
+
 const CONSTS = {
     FIELDS: 'fields',
     FIELD: 'field',
 };
+
+
+
+const currentMonth = convertTimeNumberToString(new Date().getMonth() + 1);
+const currentYear = new Date().getFullYear();
 
 // interface FormModel
 
@@ -87,7 +97,10 @@ const Home: NextPage = () => {
                             ))}
 
                             {Number(result) !== 0 && (
-                                <div className='total'>Total</div>
+                                <>
+                                    <div className='total'>Total</div>
+                                    <div className='total'>Date</div>
+                                </>
                             )}
                         </div>
 
@@ -113,7 +126,10 @@ const Home: NextPage = () => {
                             ))}
 
                             {Number(result) !== 0 && (
-                                <div className='result'>{result}</div>
+                                <>
+                                    <div className='result'>{result}</div>
+                                    <div className='result'>{`${currentMonth}/${currentYear}`}</div>
+                                </>
                             )}
                         </div>
                     </div>

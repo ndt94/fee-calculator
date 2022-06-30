@@ -52,7 +52,6 @@ const Home: NextPage = () => {
   });
 
   const onSubmit = (data) => {
-    console.log("data", data);
     const total = data?.[CONSTS.FIELDS]?.reduce(
       (accumulator, current) => accumulator + current?.value,
       0

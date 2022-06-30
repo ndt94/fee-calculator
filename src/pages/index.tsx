@@ -25,6 +25,16 @@ const CONSTS = {
   FIELD: "field",
 };
 
+const templateHomeData = [
+  { name: "Tiền ĐT Mẹ 261", value: null },
+  { name: "Tiền ĐT Mẹ 135", value: null },
+  { name: "Tiền ĐT Còi", value: null },
+  { name: "Tiền ĐT Bố", value: null },
+  { name: "Tiền Điện Royal", value: null },
+  { name: "Tiền Nhà Royal", value: null },
+  { name: "Tiền Internet KL", value: null },
+];
+
 const currentMonth = convertTimeNumberToString(new Date().getMonth() + 1);
 const currentYear = new Date().getFullYear();
 
@@ -32,7 +42,8 @@ const currentYear = new Date().getFullYear();
 
 const Home: NextPage = () => {
   const [result, setResult] = useState("");
-  const { register, handleSubmit, reset, control, formState } = useForm();
+  const { register, handleSubmit, reset, watch, setValue, control, formState } =
+    useForm();
   const { isSubmitted } = formState;
   const { fields, append, remove } = useFieldArray({
     control, // control props comes from useForm (optional: if you are using FormContext)
@@ -41,6 +52,7 @@ const Home: NextPage = () => {
   });
 
   const onSubmit = (data) => {
+    console.log("data", data);
     const total = data?.[CONSTS.FIELDS]?.reduce(
       (accumulator, current) => accumulator + current?.value,
       0
@@ -48,7 +60,7 @@ const Home: NextPage = () => {
     setResult(formatNumber(total));
   };
 
-  const onError = (errors) => console.log(errors);
+  const onError = (errors) => console.error(errors);
 
   const handleReset = () => {
     reset();
@@ -65,6 +77,17 @@ const Home: NextPage = () => {
   };
 
   const handleRemoveField = (index: number) => () => remove(index);
+
+  // TEMPLATE PART
+  const templateSelectValue = watch("template") || "";
+
+  const handleChangeTemplate = (event: any) => {
+    if (event.target.value === "Home") {
+      templateHomeData.forEach((item) => append(item));
+    } else {
+      handleReset();
+    }
+  };
 
   return (
     <div className="wrapper">
@@ -127,12 +150,17 @@ const Home: NextPage = () => {
 
         <div className="actions">
           <label htmlFor="Template">Select a template:</label>
-          <select name="template" id="template">
+          <select
+            value={templateSelectValue}
+            {...register("template")}
+            onChange={handleChangeTemplate}
+            name="template"
+            id="template"
+          >
             <option value="">Choose here</option>
             <option value="Home">Home Template</option>
           </select>
-          <button type="button">Template</button>
-          
+
           <button type="button" onClick={handleAdd}>
             Add field
           </button>
@@ -169,6 +197,7 @@ const Home: NextPage = () => {
           .fieldValue span {
             display: inline-block;
             margin-left: 8px;
+            cursor: pointer;
           }
 
           .total {

@@ -1,7 +1,7 @@
-import Head from "next/head";
-import { useFieldArray, useForm } from "react-hook-form";
 import type { NextPage } from "next";
-import { useState } from "react";
+import Head from "next/head";
+import { ChangeEvent, useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
 
 export const formatNumber = (value: number): string => {
   if (!Number(value)) return value === 0 ? "0" : "";
@@ -25,15 +25,23 @@ const CONSTS = {
   FIELD: "field",
 };
 
-const templateHomeData = [
+const templateKLData = [
   { name: "Tiền ĐT Mẹ 261", value: null },
   { name: "Tiền ĐT Mẹ 135", value: null },
-  { name: "Tiền ĐT Còi", value: null },
   { name: "Tiền ĐT Bố", value: null },
-  { name: "Tiền Điện Royal", value: null },
-  { name: "Tiền Nhà Royal", value: null },
   { name: "Tiền Internet KL", value: null },
 ];
+
+const templateRoyalData = [
+  { name: "Tiền ĐT Còi", value: null },
+  { name: "Tiền Điện Royal", value: null },
+  { name: "Tiền Nhà Royal", value: null },
+];
+
+const templateData = {
+  KL: templateKLData,
+  Royal: templateRoyalData,
+};
 
 const currentMonth = convertTimeNumberToString(new Date().getMonth() + 1);
 const currentYear = new Date().getFullYear();
@@ -67,12 +75,8 @@ const Home: NextPage = () => {
   };
 
   const handleAdd = () => {
-    if (!isSubmitted) {
-      append({});
-    } else {
-      append({});
-      reset(undefined, { keepValues: true }); // values in reset is optional so we put undefined as TS docs, https://stackoverflow.com/questions/30734509/how-to-pass-optional-parameters-while-omitting-some-other-optional-parameters
-    }
+    if (isSubmitted) reset(undefined, { keepValues: true }); // values in reset is optional so we put undefined as TS docs, https://stackoverflow.com/questions/30734509/how-to-pass-optional-parameters-while-omitting-some-other-optional-parameters
+    append({});
   };
 
   const handleRemoveField = (index: number) => () => remove(index);
@@ -80,12 +84,11 @@ const Home: NextPage = () => {
   // TEMPLATE PART
   const templateSelectValue = watch("template") || "";
 
-  const handleChangeTemplate = (event: any) => {
-    if (event.target.value === "Home") {
-      templateHomeData.forEach((item) => append(item));
-    } else {
-      handleReset();
-    }
+  const handleChangeTemplate = (event: ChangeEvent<HTMLSelectElement>) => {
+    if (!event.target.value) return handleReset();
+    remove();
+    templateData[event.target.value].forEach((item) => append(item));
+    setValue("template", event.target.value);
   };
 
   return (
@@ -96,81 +99,80 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <>
-        <form>
-          <div className="fee">
-            <div className="fieldsName">
-              {fields.map((field, index) => (
-                <div className="fieldName" key={index}>
-                  <input
-                    key={field.id}
-                    {...register(`fields.${index}.name` as const, {
-                      required: true,
-                    })}
-                    placeholder="Enter field name"
-                    readOnly={isSubmitted}
-                  />
-                </div>
-              ))}
+      <form>
+        <div className="fee">
+          <div className="fieldsName">
+            {fields.map((field, index) => (
+              <div className="fieldName" key={index}>
+                <input
+                  key={field.id}
+                  {...register(`fields.${index}.name` as const, {
+                    required: true,
+                  })}
+                  placeholder="Enter field name"
+                  readOnly={isSubmitted}
+                />
+              </div>
+            ))}
 
-              {Number(result) !== 0 && (
-                <>
-                  <div className="total">Total</div>
-                  <div className="total">Date</div>
-                </>
-              )}
-            </div>
-
-            <div className="fieldsValue">
-              {fields.map((field, index) => (
-                <div className="fieldValue" key={index}>
-                  <input
-                    key={field.id} // important to include key with field's id
-                    {...register(`fields.${index}.value` as const, {
-                      required: true,
-                      valueAsNumber: true,
-                    })}
-                    type="number"
-                  />
-
-                  <span onClick={handleRemoveField(index)}>X</span>
-                </div>
-              ))}
-
-              {Number(result) !== 0 && (
-                <>
-                  <div className="result">{result}</div>
-                  <div className="result">{`${currentMonth}/${currentYear}`}</div>
-                </>
-              )}
-            </div>
+            {Number(result) !== 0 && (
+              <>
+                <div className="total">Total</div>
+                <div className="total">Date</div>
+              </>
+            )}
           </div>
-        </form>
 
-        <div className="actions">
-          <label htmlFor="Template">Select a template:</label>
-          <select
-            value={templateSelectValue}
-            {...register("template")}
-            onChange={handleChangeTemplate}
-            name="template"
-            id="template"
-          >
-            <option value="">Choose here</option>
-            <option value="Home">Home Template</option>
-          </select>
+          <div className="fieldsValue">
+            {fields.map((field, index) => (
+              <div className="fieldValue" key={index}>
+                <input
+                  key={field.id} // important to include key with field's id
+                  {...register(`fields.${index}.value` as const, {
+                    required: true,
+                    valueAsNumber: true,
+                  })}
+                  type="number"
+                />
 
-          <button type="button" onClick={handleAdd}>
-            Add field
-          </button>
-          <button type="button" onClick={handleSubmit(onSubmit, onError)}>
-            Calculate
-          </button>
-          <button type="button" onClick={handleReset}>
-            Reset
-          </button>
+                <span onClick={handleRemoveField(index)}>X</span>
+              </div>
+            ))}
+
+            {Number(result) !== 0 && (
+              <>
+                <div className="result">{result}</div>
+                <div className="result">{`${currentMonth}/${currentYear}`}</div>
+              </>
+            )}
+          </div>
         </div>
-      </>
+      </form>
+
+      <div className="actions">
+        <label htmlFor="Template">Select a template:</label>
+        <select
+          {...register("template")}
+          value={templateSelectValue}
+          onChange={handleChangeTemplate}
+          name="template"
+          id="template"
+        >
+          <option value="">Choose here</option>
+          <option value="KL">KL Template</option>
+          <option value="Royal">Royal Template</option>
+        </select>
+
+        <button type="button" onClick={handleAdd}>
+          Add field
+        </button>
+        <button type="button" onClick={handleSubmit(onSubmit, onError)}>
+          Calculate
+        </button>
+        <button type="button" onClick={handleReset}>
+          Reset
+        </button>
+      </div>
 
       <style jsx>
         {`

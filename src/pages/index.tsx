@@ -30,6 +30,11 @@ const templateKLData = [
   { name: "Tiền ĐT Mẹ 135", value: null },
   { name: "Tiền ĐT Bố", value: null },
   { name: "Tiền Internet KL", value: null },
+  { name: "Tiền điện KL 1", value: null },
+  { name: "Tiền điện KL 2", value: null },
+  { name: "Tiền điện KL 3", value: null },
+  { name: "Tiền nước KL 1", value: null },
+  { name: "Tiền nước KL 2", value: null },
 ];
 
 const templateRoyalData = [
